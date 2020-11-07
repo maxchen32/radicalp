@@ -3,10 +3,14 @@
 using namespace std;
 
 int main(int argc, char* argv[]){
-    Fraction aaa = Fraction(1,2);
-    Fraction bbb = Fraction(1,3);
-    Fraction ccc;
-    ccc = aaa + bbb;
-    cout << ccc;
+    Fraction aaa = Fraction(2,3);
+    Fraction bbb = Fraction(4,6);
+
+    cout << aaa << " < " << bbb << ": " << (aaa < bbb) << endl;
+    cout << aaa << " > " << bbb << ": " << (aaa > bbb) << endl;
+    cout << aaa << " <= " << bbb << ": " << (aaa <= bbb) << endl;
+    cout << aaa << " >= " << bbb << ": " << (aaa >= bbb) << endl;
+    cout << aaa << " == " << bbb << ": " << (aaa == bbb) << endl;
+
     return 0;
 }
