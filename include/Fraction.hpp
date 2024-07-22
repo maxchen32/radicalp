@@ -10,18 +10,18 @@ protected:
 
     void reduce(int& a, int& b);              //数约分
     int gcd(int a, int b);						//最大公因数
-    long long lgcd(long long a, long long b);
+    long long gcd(long long a, long long b);
     int lcm(int a, int b);						//最小公倍数
-    int qpow(int base, int expt);				//快速幂
+    Fraction qpow(int base, int expt);				//快速幂
     void fixsignFrac();				            //符号修正、错误处理
     void reduceFrac();				            //分数约分
     int cmpFrac(const Fraction &b);             //比较 返回-1 , 0 , 1
     inline int serious_error();
 
 public:
-    Fraction (int up, int down);
-    Fraction ();
-    Fraction (const Fraction &b);
+    Fraction(int up, int down);
+    Fraction();
+    Fraction(const Fraction &b);
  //   virtual ~Fraction ();
 
     friend std::ostream& operator<<(std::ostream &out, const Fraction& res){
