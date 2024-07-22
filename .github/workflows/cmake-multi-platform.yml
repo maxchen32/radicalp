@@ -63,6 +63,6 @@ jobs:
 
     - name: 'Upload Artifact'
       uses: actions/upload-artifact@v4.3.4
-        with:
-          path: build/
-          retention-days: 90
+      with:
+        path: build/
+        retention-days: 90
