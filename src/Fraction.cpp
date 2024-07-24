@@ -1,9 +1,8 @@
 #include <iostream>
 #include "Fraction.hpp"
 
-inline int Fraction::serious_error() {
-	std::cerr << "Serious error: Maybe 0(zero) appered in denominators." << std::endl;
-	exit(1);
+void Fraction::error_print(const char* error_function, const char* error_content) {
+	std::cerr << "Error: Fraction: " << error_function << ": " << error_content << std::endl;
 }
 
 Fraction::Fraction(int up, int down) {
@@ -11,6 +10,8 @@ Fraction::Fraction(int up, int down) {
 	this->down = down;
 	if (down != 0)
 		this->reduceFrac();
+}
+Fraction::Fraction(int up) : up(up), down(1) {
 }
 Fraction::Fraction(){
 	this->up = 0;
@@ -20,6 +21,16 @@ Fraction::Fraction(const Fraction &b) {
 	this->up = b.up;
 	this->down = b.down;
 }
+Fraction::~Fraction() {};
+
+std::ostream& operator<<(std::ostream &out, const Fraction& a) {
+	out << a.up;
+	if (a.down != 1) {
+		out << "/" << a.down;
+	}
+	return out;
+}
+
 void Fraction::reduce(int& a, int& b){
 	int gcdn = gcd(a, b);
 	a /= gcdn;
@@ -34,19 +45,23 @@ void Fraction::reduce(int& a, int& b){
 int Fraction::gcd(int a, int b){
 	if (a && b) {
 		while((a%=b) && (b%=a));
-		return abs(a+b);
-		} else {
+		int g = a+b;
+		return g > 0 ? g : -g;
+	} else {
 		return 1;
 	}
 }
+/*
 long long Fraction::gcd(long long a, long long b){
 	if (a && b) {
 		while((a%=b) && (b%=a));
-		return abs(a+b);
-		} else {
+		int g = a+b;
+		return g > 0 ? g : -g;
+	} else {
 		return 1;
 	}
 }
+*/
 int Fraction::lcm(int a, int b){
 	return a / gcd(a, b) * b ;
 }
@@ -70,7 +85,8 @@ Fraction Fraction::qpow(int base, int expt){
 
 void Fraction::fixsignFrac(){
 	if (0 == this->down){
-		serious_error();
+		error_print("fixsignFrac", "Zero in denominators.");
+		exit(EDOM);
 	}
 	if (0 == this->up){
 		this->down = 1;
@@ -83,13 +99,13 @@ void Fraction::fixsignFrac(){
 	}
 }
 void Fraction::reduceFrac(){
-	this->fixsignFrac();
+	fixsignFrac();
 	int gcdn = gcd(this->up, this->down);
 	this->up /= gcdn;
 	this->down /= gcdn;
 }
 
-Fraction Fraction::operator+(const Fraction &b){
+Fraction Fraction::operator+(const Fraction &b) const {
 	Fraction res;
 	int lcmn = lcm(this->down, b.down);
 	res.up = lcmn / this->down * this->up + lcmn / b.down * b.up;
@@ -97,16 +113,20 @@ Fraction Fraction::operator+(const Fraction &b){
 	res.reduceFrac();
 	return res;
 }
-Fraction Fraction::operator+=(const Fraction &b){
+Fraction Fraction::operator+=(const Fraction &b) {
 	*this = *this + b;
 	return *this;
 }
-Fraction Fraction::operator-(const Fraction &b){
+Fraction Fraction::operator-(const Fraction &b) const {
 	Fraction res = b;
 	res.up = -res.up;
 	return *this + res;
 }
-Fraction Fraction::operator*(const Fraction &b){
+Fraction Fraction::operator-=(const Fraction &b) {
+	*this = *this - b;
+	return *this;
+}
+Fraction Fraction::operator*(const Fraction &b) const {
 	Fraction res, tmp;
 	int gcdn1 = gcd(this->up, b.down);
 	int gcdn2 = gcd(this->down, b.up);
@@ -119,64 +139,73 @@ Fraction Fraction::operator*(const Fraction &b){
 	res.fixsignFrac();
 	return res;
 }
-Fraction Fraction::operator/(const Fraction &b){
+
+Fraction Fraction::operator*=(const Fraction &b) {
+	*this = *this * b;
+	return *this;
+}
+
+Fraction Fraction::operator/(const Fraction &b) const {
 	Fraction res = b;
-	res.up ^= res.down ^= res.up ^= res.down;
+	//res.up ^= res.down ^= res.up ^= res.down;
+	int temp = res.up;
+	res.up = res.down;
+	res.down = temp;
 	return *this * res;
 }
-Fraction Fraction::operator^(int expt){
+
+Fraction Fraction::operator/=(const Fraction &b) {
+	*this = *this / b;
+	return *this;
+}
+
+Fraction Fraction::operator^(int expt) const {
 	Fraction up = qpow(this->up, expt);
 	Fraction down = qpow(this->down, expt);
 	return up / down;
 }
 
-bool Fraction::operator<(const Fraction &nextFrac){
-	Fraction a = *this;
-	Fraction b = nextFrac;
+Fraction Fraction::operator^=(int expt) {
+	*this = *this ^ expt;
+	return *this;
+}
+
+int Fraction::cmpFrac(const Fraction &a, const Fraction &b) {
+	if (!(a.down && b.down)){
+		error_print("cmpFrac", "Zero in denominators.");
+		exit(EDOM);
+	}
 	if ((a.up == b.up && a.down == b.down) || (a.up == 0 && b.up == 0))
-		return false;
+		return 0;
 	else if (a.up < 0 && b.up > 0)
-		return true;
-	reduce(a.up, b.up);
-	reduce(a.down, b.down);
-	long long resup = a.up * b.down;
-	long long resdown = a.down * b.up;
-	if (resup < resdown)
-		return true;
-	return false;
-}
-bool Fraction::operator>(const Fraction &nextFrac){
-	Fraction a = *this;
-	Fraction b = nextFrac;
-	if ((a.up == b.up && a.down == b.down) || (a.up == 0 && b.up == 0))
-		return false;
+		return -1;
 	else if (a.up > 0 && b.up < 0)
-		return true;
-	reduce(a.up, b.up);
-	reduce(a.down, b.down);
-	long long resup = a.up * b.down;
-	long long resdown = a.down * b.up;
-	if (resup > resdown)
-		return true;
-	return false;
+		return 1;
+	int gcdup = gcd(a.up, b.up);
+	int gcddown = gcd(a.down, b.down);
+	long long resup = a.up / gcdup * (b.down / gcddown);
+	long long resdown = a.down / gcddown * (b.up / gcdup);
+	if (resup < resdown)
+		return -1;
+	else if (resup > resdown)
+		return 1;
+	error_print("cmpFrac", "Unknown error.");
+	exit(1);
 }
-bool Fraction::operator==(const Fraction &b){
-	Fraction a = *this;
-	if ((a.up == b.up && a.down == b.down) || (a.up == 0 && b.up == 0))
-		return true;
-	return false;
+
+bool Fraction::operator<(const Fraction &b) const {
+	return cmpFrac(*this, b) < 0;
 }
-bool Fraction::operator<=(const Fraction &b){
-	Fraction a = *this;
-	if (a < b || a == b)
-		return true;
-	else
-		return false;
+bool Fraction::operator>(const Fraction &b) const {
+	return cmpFrac(*this, b) > 0;
 }
-bool Fraction::operator>=(const Fraction &b){
-	Fraction a = *this;
-	if (a > b || a == b)
-		return true;
-	else
-		return false;
+bool Fraction::operator==(const Fraction &b) const {
+	return cmpFrac(*this, b) == 0;
 }
+bool Fraction::operator<=(const Fraction &b) const {
+	return cmpFrac(*this, b) <= 0;
+}
+bool Fraction::operator>=(const Fraction &b) const {
+	return cmpFrac(*this, b) >= 0;
+}
+

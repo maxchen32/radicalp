@@ -1,45 +1,48 @@
 #ifndef _FRACTION_HPP
 #define _FRACTION_HPP
 
-#include <iostream>
-
 class Fraction {
-protected:
-    int up;
-    int down;
+private:
+	int up;
+	int down;
 
-    void reduce(int& a, int& b);              //ÊıÔ¼·Ö
-    int gcd(int a, int b);						//×î´ó¹«ÒòÊı
-    long long gcd(long long a, long long b);
-    int lcm(int a, int b);						//×îĞ¡¹«±¶Êı
-    Fraction qpow(int base, int expt);				//¿ìËÙÃİ
-    void fixsignFrac();				            //·ûºÅĞŞÕı¡¢´íÎó´¦Àí
-    void reduceFrac();				            //·ÖÊıÔ¼·Ö
-    int cmpFrac(const Fraction &b);             //±È½Ï ·µ»Ø-1 , 0 , 1
-    inline int serious_error();
+	static void reduce(int& a, int& b);			  //æ•°çº¦åˆ†
+	static int gcd(int a, int b);						//æœ€å¤§å…¬å› æ•°
+	// static long long gcd(long long a, long long b);
+	static int lcm(int a, int b);						//æœ€å°å…¬å€æ•°
+	static Fraction qpow(int base, int expt);				//å¿«é€Ÿå¹‚
+
+	void fixsignFrac();							//ç¬¦å·ä¿®æ­£ã€é”™è¯¯å¤„ç†
+	void reduceFrac();							//åˆ†æ•°çº¦åˆ†
+	static void error_print(const char* error_function, const char* error_content);
 
 public:
-    Fraction(int up, int down);
-    Fraction();
-    Fraction(const Fraction &b);
- //   virtual ~Fraction ();
+	Fraction(int up, int down);
+	Fraction(int up);
+	Fraction();
+	Fraction(const Fraction &b);
+	~Fraction();
 
-    friend std::ostream& operator<<(std::ostream &out, const Fraction& res){
-        out << "(" << res.up << "/" << res.down << ")";
-        return out;
-    }
-    Fraction operator+(const Fraction &b);	//¼Ó·¨
-    Fraction operator+=(const Fraction &b);
-    Fraction operator-(const Fraction &b);	//¼õ·¨
-    Fraction operator*(const Fraction &b);	//³Ë·¨
-    Fraction operator/(const Fraction &b);	//³ı·¨
-    Fraction operator^(int expt);		//³Ë·½
-//    Radical  sqrt();               //¿ª·½
-    bool operator<(const Fraction &nextFrac);
-    bool operator>(const Fraction &nextFrac);
-    bool operator==(const Fraction &b);
-    bool operator<=(const Fraction &b);
-    bool operator>=(const Fraction &b);
+	static int cmpFrac(const Fraction &a, const Fraction &b);			 //æ¯”è¾ƒ è¿”å›-1 , 0 , 1
+
+	friend std::ostream& operator<<(std::ostream &out, const Fraction& a);
+	Fraction& operator=(const Fraction &b) = default;
+	Fraction operator+(const Fraction &b) const;	//åŠ æ³•
+	Fraction operator+=(const Fraction &b);
+	Fraction operator-(const Fraction &b) const;	//å‡æ³•
+	Fraction operator-=(const Fraction &b);
+	Fraction operator*(const Fraction &b) const;	//ä¹˜æ³•
+	Fraction operator*=(const Fraction &b);
+	Fraction operator/(const Fraction &b) const;	//é™¤æ³•
+	Fraction operator/=(const Fraction &b);
+	Fraction operator^(int expt) const;		//ä¹˜æ–¹
+	Fraction operator^=(int expt);
+//	Radical  sqrt();			   //å¼€æ–¹
+	bool operator<(const Fraction &a) const;
+	bool operator>(const Fraction &a) const;
+	bool operator==(const Fraction &b) const;
+	bool operator<=(const Fraction &b) const;
+	bool operator>=(const Fraction &b) const;
 };
 
 

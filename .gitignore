@@ -62,3 +62,4 @@ bin/
 push.py
 data.txt
 build/
+.vscode/
